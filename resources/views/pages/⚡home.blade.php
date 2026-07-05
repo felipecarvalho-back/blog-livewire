@@ -98,28 +98,8 @@ new #[Title('Home')] class extends Component
 
 <div class="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 min-h-screen flex flex-col justify-between antialiased">
     <div>
-        <flux:header container class="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
-            <flux:brand href="{{ route('home') }}" name="DevBlog" class="font-bold tracking-tight">
-                <x-slot name="logo" class="bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 rounded-lg flex items-center justify-center p-1 w-8 h-8">
-                    <flux:icon name="book-open" class="w-5 h-5 text-white dark:text-zinc-900" />
-                </x-slot>
-            </flux:brand>
-            
-            <flux:navbar class="-mb-px max-lg:hidden">
-                <flux:navbar.item href="{{ route('home') }}" current icon="home">Home</flux:navbar.item>
-                <flux:navbar.item href="#" icon="document-text">Artigos</flux:navbar.item>
-                <flux:navbar.item href="#" icon="information-circle">Sobre</flux:navbar.item>
-            </flux:navbar>
-            
-            <flux:spacer />
-            
-            <flux:navbar class="gap-2">
-                <flux:navbar.item href="{{ route('login') }}" icon="arrow-right-end-on-rectangle" wire:navigate>Entrar</flux:navbar.item>
-                <flux:button href="{{ route('register') }}" variant="primary" icon="user-plus" wire:navigate class="max-sm:hidden">
-                    Cadastrar
-                </flux:button>
-            </flux:navbar>
-        </flux:header>
+        
+        <x-nav />
 
         @if (session('status'))
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
