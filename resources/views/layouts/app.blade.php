@@ -16,6 +16,18 @@
 <body>
     {{ $slot }}
 
+    @persist('toast')
+        <flux:toast />
+    @endpersist
+
+    @if (session('status'))
+        <div x-data x-init="$flux.toast({ text: '{{ session('status') }}', variant: 'success' })"></div>
+    @endif
+
+    @if (session('error'))
+        <div x-data x-init="$flux.toast({ text: '{{ session('error') }}', variant: 'danger' })"></div>
+    @endif
+
     @livewireScripts
     @fluxScripts
 

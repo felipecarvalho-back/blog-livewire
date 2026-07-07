@@ -101,13 +101,6 @@ new #[Title('Home')] class extends Component
         
         <x-nav />
 
-        @if (session('status'))
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-                <flux:callout variant="success">
-                    {{ session('status') }}
-                </flux:callout>
-            </div>
-        @endif
 
         <!-- Hero Section -->
         <div class="relative overflow-hidden bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:to-zinc-900 py-16 sm:py-24 border-b border-zinc-200 dark:border-zinc-800">
