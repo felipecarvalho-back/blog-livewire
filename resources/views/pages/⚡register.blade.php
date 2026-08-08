@@ -17,7 +17,7 @@ new #[Title('Cadastrar')] class extends Component
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'min:6', 'confirmed'],
             'terms' => ['accepted'],
         ];
@@ -31,6 +31,7 @@ new #[Title('Cadastrar')] class extends Component
             'email.required' => 'O campo e-mail é obrigatório.',
             'email.email' => 'O e-mail informado não é válido.',
             'email.max' => 'O e-mail não pode ter mais de 255 caracteres.',
+            'email.unique' => 'O e-mail informado já está cadastrado.',
             'password.required' => 'O campo senha é obrigatório.',
             'password.min' => 'A senha deve ter pelo menos 6 caracteres.',
             'password.confirmed' => 'A confirmação da senha não corresponde.',

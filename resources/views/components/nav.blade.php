@@ -7,7 +7,8 @@
     </flux:brand>
 
     <flux:navbar class="-mb-px max-lg:hidden">
-        <flux:navbar.item href="{{ route('home') }}" current icon="home">Home</flux:navbar.item>
+        <flux:navbar.item href="{{ route('home') }}" :current="request()->routeIs('home')" icon="home">Home</flux:navbar.item>
+        <flux:navbar.item href="{{ route('posts.create') }}" :current="request()->routeIs('posts.create')" icon="pencil-square" wire:navigate>Novo Artigo</flux:navbar.item>
         <flux:navbar.item href="#" icon="document-text">Artigos</flux:navbar.item>
         <flux:navbar.item href="#" icon="information-circle">Sobre</flux:navbar.item>
     </flux:navbar>

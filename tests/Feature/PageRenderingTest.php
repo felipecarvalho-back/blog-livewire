@@ -29,4 +29,12 @@ class PageRenderingTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Criar uma conta');
     }
+
+    public function test_create_post_page_renders_successfully(): void
+    {
+        $response = $this->get('/posts/create');
+
+        $response->assertStatus(200);
+        $response->assertSee('Nova Publicação');
+    }
 }
