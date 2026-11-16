@@ -1,97 +1,22 @@
 <?php
 
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\Title;
+use App\Models\Postagem;
 
 new #[Title('Home')] class extends Component
 {
     public array $posts = [];
-    public array $comments = [];
 
-    public function mount()
+    public function mount(): void
     {
-        $this->posts = [
-            [
-                'id' => 1,
-                'title' => 'Dominando Tailwind CSS v4 no Laravel 13',
-                'excerpt' => 'Descubra as principais novidades da nova versão do Tailwind CSS e como integrá-lo de forma otimizada com o Laravel 13 utilizando o novo compilador CSS-First.',
-                'conteudo' => 'O Tailwind CSS v4.0 traz uma série de melhorias e mudanças significativas no seu motor de compilação. Com um foco enorme em performance e simplicidade, a nova versão adota uma configuração totalmente baseada em arquivos CSS (CSS-First), eliminando a necessidade do arquivo tailwind.config.js tradicional. A integração com o Vite e o Laravel 13 está mais fluida do que nunca, permitindo tempos de rebuild extremamente rápidos.',
-                'image' => 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80',
-                'category' => 'Tailwind CSS',
-                'tags' => ['Tailwind CSS', 'CSS', 'Vite', 'Laravel'],
-                'author' => [
-                    'name' => 'Felipe Carvalho',
-                    'avatar' => 'https://unavatar.io/github/felipecarvalho-back',
-                ],
-                'date' => '04 Jul, 2026',
-                'read_time' => '5 min'
-            ],
-            [
-                'id' => 2,
-                'title' => 'O Poder do Livewire v4 com Flux UI',
-                'excerpt' => 'Construa interfaces ricas, reativas e com excelente acessibilidade sem escrever uma única linha de JavaScript, usando o poder do novo ecossistema.',
-                'conteudo' => 'O Livewire v4 eleva o patamar de aplicações Laravel Full-Stack. Juntamente com o Flux UI, uma biblioteca de componentes nativos construída sob medida, o desenvolvimento de formulários, tabelas dinâmicas, modais e transições de página se torna incrivelmente ágil. O motor interno do Livewire 4 foi reestruturado para ser mais rápido e lidar com reatividade local de forma eficiente usando Alpine.js integrado.',
-                'image' => 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80',
-                'category' => 'Livewire',
-                'tags' => ['Livewire', 'Flux UI', 'Alpine.js', 'PHP'],
-                'author' => [
-                    'name' => 'Taylor Otwell',
-                    'avatar' => 'https://unavatar.io/github/taylorotwell',
-                ],
-                'date' => '02 Jul, 2026',
-                'read_time' => '8 min'
-            ],
-            [
-                'id' => 3,
-                'title' => 'Boas Práticas de Banco de Dados no Laravel',
-                'excerpt' => 'N+1, subqueries complexas e indexação. Dicas essenciais para manter o banco de dados do seu projeto rápido e escalável com Eloquent.',
-                'conteudo' => 'Conforme a sua aplicação Laravel cresce, a forma como você interage com o banco de dados se torna o principal gargalo de performance. Evitar problemas clássicos como consultas N+1 através do Eager Loading é apenas o primeiro passo. Neste artigo, abordamos o uso de subqueries complexas integradas no Eloquent através de addSelect, criação de relacionamentos dinâmicos e a importância de criar índices compostos alinhados com suas ordenações mais frequentes.',
-                'image' => 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=800&q=80',
-                'category' => 'Banco de Dados',
-                'tags' => ['Banco de Dados', 'Eloquent', 'SQL', 'Performance'],
-                'author' => [
-                    'name' => 'Caleb Porzio',
-                    'avatar' => 'https://unavatar.io/github/calebporzio',
-                ],
-                'date' => '28 Jun, 2026',
-                'read_time' => '12 min'
-            ]
-        ];
-
-        // Seed some initial comments
-        $this->comments = [
-            1 => [
-                [
-                    'id' => 1,
-                    'author' => [
-                        'name' => 'Caleb Porzio',
-                        'avatar' => 'https://unavatar.io/github/calebporzio',
-                    ],
-                    'texto' => 'A compilação do Tailwind v4 com o Vite está realmente voando! Excelente artigo.',
-                    'date' => 'Há 2 horas',
-                ],
-                [
-                    'id' => 2,
-                    'author' => [
-                        'name' => 'Taylor Otwell',
-                        'avatar' => 'https://unavatar.io/github/taylorotwell',
-                    ],
-                    'texto' => 'Excelente explicação sobre o novo fluxo CSS-first. O ecossistema Laravel 13 está muito bem alinhado com essa versão.',
-                    'date' => 'Há 1 hora',
-                ]
-            ],
-            2 => [
-                [
-                    'id' => 3,
-                    'author' => [
-                        'name' => 'Jess Archer',
-                        'avatar' => 'https://unavatar.io/github/jessarcher',
-                    ],
-                    'texto' => 'Amei a facilidade de usar o Flux UI. Facilitou muito a criação de modais reativos!',
-                    'date' => 'Há 3 dias',
-                ]
-            ]
-        ];
+        $this->posts = Postagem::with('user')
+            ->where('status', 'publicado')
+            ->orderBy('id', 'desc')
+            ->get()
+            ->toArray();
     }
 };
 ?>
@@ -134,80 +59,102 @@ new #[Title('Home')] class extends Component
                 </flux:heading>
                 
                 @if(count($posts) > 0)
-                    @php $featured = $posts[0]; @endphp
+                    @php
+                        $featured = $posts[0];
+                        $featuredAuthor = $featured['user']['name'] ?? 'Autor';
+                        $featuredReadTime = max(1, (int) ceil(str_word_count(strip_tags($featured['conteudo'])) / 200));
+                    @endphp
                     <div class="group relative bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 grid grid-cols-1 lg:grid-cols-2 cursor-pointer">
                         <div class="h-64 lg:h-auto min-h-[300px] relative overflow-hidden">
-                            <img src="{{ $featured['image'] }}" alt="{{ $featured['title'] }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" />
+                            <img src="{{ $featured['imagem'] ?: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1170&q=80' }}" alt="{{ $featured['titulo'] }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" />
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent lg:hidden"></div>
                         </div>
                         <div class="p-8 lg:p-12 flex flex-col justify-between">
                             <div>
-                                <flux:badge color="violet" class="mb-4">{{ $featured['category'] }}</flux:badge>
+                                @if(!empty($featured['tags']))
+                                    <div class="flex flex-wrap gap-2 mb-4">
+                                        @foreach(array_slice($featured['tags'], 0, 3) as $tag)
+                                            <flux:badge color="violet">{{ $tag }}</flux:badge>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <flux:badge color="violet" class="mb-4">Artigo</flux:badge>
+                                @endif
                                 <h3 class="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
-                                    {{ $featured['title'] }}
+                                    {{ $featured['titulo'] }}
                                 </h3>
                                 <p class="mt-4 text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                    {{ $featured['excerpt'] }}
+                                    {{ Str::limit(strip_tags($featured['conteudo']), 220) }}
                                 </p>
                             </div>
                             
                             <div class="mt-8 flex items-center justify-between">
                                 <div class="flex items-center gap-3">
-                                    <img src="{{ $featured['author']['avatar'] }}" alt="{{ $featured['author']['name'] }}" class="w-10 h-10 rounded-full border border-zinc-200 dark:border-zinc-700" />
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($featuredAuthor) }}&background=7c3aed&color=fff" alt="{{ $featuredAuthor }}" class="w-10 h-10 rounded-full border border-zinc-200 dark:border-zinc-700" />
                                     <div>
-                                        <p class="text-sm font-semibold text-zinc-900 dark:text-white">{{ $featured['author']['name'] }}</p>
-                                        <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ $featured['date'] }}</p>
+                                        <p class="text-sm font-semibold text-zinc-900 dark:text-white">{{ $featuredAuthor }}</p>
+                                        <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ Carbon::parse($featured['created_at'])->format('d/m/Y') }}</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full">
                                     <flux:icon name="clock" class="w-3.5 h-3.5" />
-                                    {{ $featured['read_time'] }}
+                                    {{ $featuredReadTime }} min de leitura
                                 </div>
                             </div>
                         </div>
+                    </div>
+                @else
+                    <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-12 text-center">
+                        <p class="text-zinc-600 dark:text-zinc-400">Nenhuma publicação encontrada no momento.</p>
                     </div>
                 @endif
             </div>
 
             <!-- Posts Grid -->
-            <div>
-                <flux:heading size="lg" class="mb-6">Últimas Publicações</flux:heading>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    @foreach(array_slice($posts, 1) as $post)
-                        <flux:card class="group flex flex-col justify-between overflow-hidden !p-0 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer">
-                            <div class="h-48 overflow-hidden relative">
-                                <img src="{{ $post['image'] }}" alt="{{ $post['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" />
-                            </div>
-                            <div class="p-6 flex-grow flex flex-col justify-between">
-                                <div>
-                                    <div class="flex items-center justify-between mb-3">
-                                        <flux:badge color="zinc" variant="subtle">{{ $post['category'] }}</flux:badge>
-                                        <div class="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
-                                            <flux:icon name="clock" class="w-3.5 h-3.5" />
-                                            {{ $post['read_time'] }}
+            @if(count($posts) > 1)
+                <div>
+                    <flux:heading size="lg" class="mb-6">Últimas Publicações</flux:heading>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        @foreach(array_slice($posts, 1) as $post)
+                            @php
+                                $postAuthor = $post['user']['name'] ?? 'Autor';
+                                $postReadTime = max(1, (int) ceil(str_word_count(strip_tags($post['conteudo'])) / 200));
+                            @endphp
+                            <flux:card class="group flex flex-col justify-between overflow-hidden !p-0 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer">
+                                <div class="h-48 overflow-hidden relative">
+                                    <img src="{{ $post['imagem'] ?: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1170&q=80' }}" alt="{{ $post['titulo'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" />
+                                </div>
+                                <div class="p-6 flex-grow flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex items-center justify-between mb-3">
+                                            <flux:badge color="zinc" variant="subtle">{{ $post['tags'][0] ?? 'Artigo' }}</flux:badge>
+                                            <div class="flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
+                                                <flux:icon name="clock" class="w-3.5 h-3.5" />
+                                                {{ $postReadTime }} min de leitura
+                                            </div>
+                                        </div>
+                                        <h4 class="text-lg font-bold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                            {{ $post['titulo'] }}
+                                        </h4>
+                                        <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 line-clamp-3">
+                                            {{ Str::limit(strip_tags($post['conteudo']), 150) }}
+                                        </p>
+                                    </div>
+
+                                    <div class="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800/50 flex items-center gap-3">
+                                        <img src="https://ui-avatars.com/api/?name={{ urlencode($postAuthor) }}&background=7c3aed&color=fff" alt="{{ $postAuthor }}" class="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-700" />
+                                        <div>
+                                            <p class="text-xs font-semibold text-zinc-900 dark:text-white">{{ $postAuthor }}</p>
+                                            <p class="text-[10px] text-zinc-500 dark:text-zinc-400">{{ Carbon::parse($post['created_at'])->format('d/m/Y') }}</p>
                                         </div>
                                     </div>
-                                    <h4 class="text-lg font-bold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                        {{ $post['title'] }}
-                                    </h4>
-                                    <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400 line-clamp-3">
-                                        {{ $post['excerpt'] }}
-                                    </p>
                                 </div>
-
-                                <div class="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800/50 flex items-center gap-3">
-                                    <img src="{{ $post['author']['avatar'] }}" alt="{{ $post['author']['name'] }}" class="w-8 h-8 rounded-full border border-zinc-200 dark:border-zinc-700" />
-                                    <div>
-                                        <p class="text-xs font-semibold text-zinc-900 dark:text-white">{{ $post['author']['name'] }}</p>
-                                        <p class="text-[10px] text-zinc-500 dark:text-zinc-400">{{ $post['date'] }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </flux:card>
-                    @endforeach
+                            </flux:card>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
+            @endif
         </main>
     </div>
 

@@ -66,6 +66,12 @@ new #[Title('Criar Postagem - DevBlog')] class extends Component
     {
         $data = $this->validate();
 
+        $data['user_id'] = Auth::id();
+
+        if($data['imagem'] == ''){
+            $data['imagem'] = 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80';
+        }
+
         Postagem::create($data);
 
         $statusLabel = $this->status === 'publicado' ? 'publicado' : 'salvo como rascunho';
@@ -108,7 +114,7 @@ new #[Title('Criar Postagem - DevBlog')] class extends Component
 
                 <div class="flex items-center gap-3">
                     <flux:modal.trigger name="post-preview-modal">
-                        <flux:button variant="outline" icon="eye">
+                        <flux:button wire:click="$refresh" variant="outline" icon="eye">
                             Pré-visualizar
                         </flux:button>
                     </flux:modal.trigger>
@@ -130,7 +136,7 @@ new #[Title('Criar Postagem - DevBlog')] class extends Component
                         class="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-6">
                         <flux:field>
                             <flux:label class="text-base font-semibold">Título do Artigo</flux:label>
-                            <flux:input wire:model.live.debounce.300ms="titulo"
+                            <flux:input wire:model="titulo"
                                 placeholder="Ex: Criando APIs Robustas com Laravel 13 e Livewire v4"
                                 class="text-lg font-medium" />
                             <flux:description>Um título chamativo e descritivo ajuda mais leitores a encontrarem sua
@@ -153,7 +159,7 @@ new #[Title('Criar Postagem - DevBlog')] class extends Component
                         <!-- Content Field -->
                         <flux:field>
                             <flux:label class="text-base font-semibold">Conteúdo da Publicação</flux:label>
-                            <flux:textarea wire:model.live.debounce.300ms="conteudo" rows="14"
+                            <flux:textarea wire:model="conteudo" rows="14"
                                 placeholder="Comece a redigir seu artigo aqui... Você pode incluir blocos de código PHP, explicações conceituais e boas práticas."
                                 class="font-mono text-sm leading-relaxed" />
                             <flux:description>Escreva detalhes ricos, passos explicativos e trechos de código
@@ -217,7 +223,7 @@ new #[Title('Criar Postagem - DevBlog')] class extends Component
 
                         <flux:field>
                             <flux:label>URL da Imagem</flux:label>
-                            <flux:input wire:model.live.debounce.400ms="imagem"
+                            <flux:input wire:model="imagem"
                                 placeholder="https://images.unsplash.com/..." icon="link" />
                             <flux:description>Insira o link direto de uma imagem de alta qualidade (Unsplash, Pexels,
                                 etc.).</flux:description>
@@ -253,7 +259,7 @@ new #[Title('Criar Postagem - DevBlog')] class extends Component
 
                         <flux:field>
                             <flux:label>Tags (separadas por vírgula)</flux:label>
-                            <flux:input wire:model.live.debounce.200ms="tagsInput"
+                            <flux:input wire:model="tagsInput"
                                 placeholder="PHP, Laravel, Eloquent" />
                             <flux:error name="tagsInput" />
                         </flux:field>
